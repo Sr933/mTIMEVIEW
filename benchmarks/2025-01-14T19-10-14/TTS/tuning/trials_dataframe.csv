@@ -1,0 +1,2 @@
+number,value,datetime_start,datetime_complete,duration,params_activation,params_batch_size,params_dropout_p,params_hidden_size_0,params_hidden_size_1,params_hidden_size_2,params_lr,params_weight_decay,state
+0,8935.173828125,2025-01-14 19:10:14.673895,2025-01-14 19:14:40.136624,0 days 00:04:25.462729,elu,64,0.35403628889802274,58,123,98,0.00011527987128232407,1.152644954031562e-05,COMPLETE

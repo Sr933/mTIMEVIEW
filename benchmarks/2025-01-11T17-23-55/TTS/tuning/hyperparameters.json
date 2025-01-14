@@ -1,0 +1,1 @@
+{"hidden_size_0": 121, "hidden_size_1": 107, "hidden_size_2": 87, "activation": "leaky_relu", "dropout_p": 0.4480456499617466, "lr": 0.0008995191735587172, "batch_size": 128, "weight_decay": 0.00013662775841358918}
