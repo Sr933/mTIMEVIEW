@@ -1,1 +1,0 @@
-{"hidden_size_0": 58, "hidden_size_1": 123, "hidden_size_2": 98, "activation": "elu", "dropout_p": 0.35403628889802274, "lr": 0.00011527987128232407, "batch_size": 64, "weight_decay": 1.152644954031562e-05}
