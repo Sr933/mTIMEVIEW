@@ -74,12 +74,12 @@ def generate_synthetic_data_sin(num_samples=1000, time_steps=25, save_path='sin_
 
     for _ in range(num_samples):
         # Randomly generate parameters for sine function
-        amplitude_shift = np.random.uniform(-2, 2)  # Shift for the amplitude
-        freq_shift = np.random.uniform(-0.5, 0.5)  # Shift for the frequency
+        amplitude_shift = np.random.uniform(0, 2)  # Shift for the amplitude
+        freq_shift = np.random.uniform(-0.5, 0.55)  # Shift for the frequency
 
         # Use random base amplitude and frequency for sine wave
-        amplitude = np.random.uniform(1, 5)  # Base amplitude of the sine wave
-        frequency = np.random.uniform(0.1, 1.0)  # Base frequency of the sine wave
+        amplitude = np.random.uniform(0.5, 2)  # Base amplitude of the sine wave
+        frequency = np.random.uniform(1, 5)  # Base frequency of the sine wave
 
         # Apply the shifts
         shifted_amplitude = amplitude + amplitude_shift
@@ -160,9 +160,9 @@ def generate_synthetic_data_exp(
 
         # Generate random amplitude and frequency for the sine wave
         
-        freq = np.random.uniform(0.1, 1.0)  # Random frequency
-        amplitude= np.random.uniform(1, 5)  # Random amplitude
-        scale_param = np.random.uniform(0.1, 1.0)  # Random scale parameter for the exponential component
+        freq = np.random.uniform(1, 5)  # Random frequency
+        amplitude= np.random.uniform(0.5, 2)  # Random amplitude
+        scale_param = np.random.uniform(0.5, 0.8)  # Random scale parameter for the exponential component
         # Generate the sine wave
         sin_series = amplitude* np.sin(2 * freq * np.pi * t)
 
