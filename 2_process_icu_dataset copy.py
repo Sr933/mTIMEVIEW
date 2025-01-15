@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import pickle
 import library
-
 def generate_dataset_from_files(directory, save_path='icu_data.pkl'):
     """
     Generates a dataset using files in the specified directory.
@@ -33,11 +32,15 @@ def generate_dataset_from_files(directory, save_path='icu_data.pkl'):
 
             # Interpolate missing values in the CSV data
             df.interpolate(method='linear', inplace=True)
+            # Forward-fill remaining NaN values
             df.ffill(inplace=True)
+
+            # Backward-fill any remaining NaN values
             df.bfill(inplace=True)
 
-            # Resample the series to a length of 500
-            def resample_series(series, target_length=500):
+            # Extract RESP, SpO2 as inputs, and HR as the target series
+            
+            def resample_series(series, target_length=50):
                 """
                 Resamples a series to a fixed number of samples using linear interpolation.
 
@@ -52,27 +55,23 @@ def generate_dataset_from_files(directory, save_path='icu_data.pkl'):
                 target_indices = np.linspace(0, 1, target_length)
                 return np.interp(target_indices, original_indices, series)
 
-            # Extract and resample each series to 500 samples
-            resp_series = resample_series(df[' RESP'].values, target_length=500)
-            spo2_series = resample_series(df[' SpO2'].values, target_length=500)
-            hr_series = resample_series(df[' HR'].values, target_length=500)
+            # Extract and resample each series
+            resp_series = resample_series(df[' RESP'].values, target_length=100)
+            spo2_series = resample_series(df[' SpO2'].values, target_length=100)
+            hr_series = resample_series(df[' HR'].values, target_length=100)
 
-            # Create 10 samples of length 50 from the resampled series
-            num_samples = 10
-            sample_length = 50
-            for i in range(num_samples):
-                start_idx = i * sample_length
-                end_idx = start_idx + sample_length
-                
-                sample = {
-                    'time_series': {
-                        '1': resp_series[start_idx:end_idx].tolist(),  # Input series 1
-                        '2': spo2_series[start_idx:end_idx].tolist()  # Input series 2
-                    },
-                    'static_features': [age, gender_binary],
-                    'target_series': hr_series[start_idx:end_idx].tolist()  # Output series
-                }
-                data.append(sample)
+            # Create a single sample
+            sample = {
+                'time_series': {
+                    '1': resp_series.tolist(),  # Input series 1
+                    '2': spo2_series.tolist()  # Input series 2
+                },
+                'static_features': [age, gender_binary],
+                'target_series': hr_series.tolist()  # Output series
+            }
+            data.append(sample)
+            
+   
 
     # Save the dataset as a pickle file
     with open(save_path, 'wb') as f:
@@ -113,8 +112,7 @@ def process_files(directory):
             # Extract age and gender from Fix file
             fix_file_path = os.path.join(directory, file_name)
             age, gender_binary = extract_age_and_gender(fix_file_path)
-            if age ==-1:
-                continue
+            
             # Look for the corresponding Numerics CSV file
             base_name = file_name.replace("_Fix.txt", "")
             csv_file_name = f"{base_name}_Numerics.csv"
@@ -141,12 +139,10 @@ def extract_age_and_gender(file_path):
     # Extract age
     age_line = next(line for line in content.splitlines() if "Age:" in line)
     age_str = age_line.split(":")[1].strip()
-    if age_str.lower() == "nan" or not age_str:  # Check for 'NaN' or empty value
-            age = -1  # Assign a placeholder value for missing age
-    elif age_str.endswith("+"):
+    if age_str.endswith("+"):
         age = 90  # Handle ages like "90+"
     else:
-        age = int(age_str)  # Convert valid age to an integer
+        age = int(age_str)
     
     # Extract gender
     gender_line = next(line for line in content.splitlines() if "Gender:" in line)
@@ -156,6 +152,6 @@ def extract_age_and_gender(file_path):
     return age, gender_binary
 
 if __name__ == '__main__':
-    # Change directory to your own directory
-    directory = "/data/sr933/physionet/physionet.org/physionet.org/files/bidmc/1.0.0/bidmc_csv"
+     ##Change directory to your own directory
+    directory = "/data/sr933/physionet/physionet.org/files/bidmc/1.0.0/bidmc_csv"
     generate_dataset_from_files(directory, save_path='icu_data.pkl')

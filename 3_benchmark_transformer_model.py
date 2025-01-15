@@ -6,6 +6,8 @@ import pickle
 import pandas as pd
 import numpy as np
 import time
+import argparse
+
 # Dataset Definition
 class TimeSeriesDataset(Dataset):
     def __init__(self, data):
@@ -124,7 +126,7 @@ def train_model(model, train_loader, val_loader, num_epochs, lr, device):
 
 
 # Main Function
-def main(pkl_path, batch_size=32, num_epochs=100, lr=0.01, device='cuda' if torch.cuda.is_available() else 'cpu'):
+def main(pkl_path, batch_size=64, num_epochs=100, lr=0.01, device='cuda' if torch.cuda.is_available() else 'cpu'):
     # Load data from pickle file
     with open(pkl_path, 'rb') as f:
         data = pickle.load(f)
@@ -151,8 +153,8 @@ def main(pkl_path, batch_size=32, num_epochs=100, lr=0.01, device='cuda' if torc
         time_series_length=time_series_length,
         n_time_series=n_time_series,
         static_feature_dim=static_feature_dim,
-        d_model=9,
-        nhead=1,
+        d_model=10,
+        nhead=2,
         num_layers=2,
         output_dim=output_dim
     )
@@ -180,7 +182,7 @@ def main(pkl_path, batch_size=32, num_epochs=100, lr=0.01, device='cuda' if torc
     return final_loss
 
 
-def run_model_with_seed(path, seed):
+def run_model_with_seed(path, seed, num_epochs):
     """
     Run the model with a specific seed and return the loss and runtime.
     """
@@ -188,7 +190,7 @@ def run_model_with_seed(path, seed):
     start_time = time.time()  # Record the start time
     
     # Assuming main() returns the loss of the model on the dataset
-    loss = main(path)  # Replace with your model's actual function
+    loss = main(path, num_epochs=num_epochs)  # Replace with your model's actual function
     
     end_time = time.time()  # Record the end time
     runtime = end_time - start_time  # Calculate runtime
@@ -197,38 +199,46 @@ def run_model_with_seed(path, seed):
 
 if __name__ == "__main__":
     # Paths to the datasets
-    pkl_paths = ['icu_data.pkl']
-    num_seeds = 1 # Define the number of seeds to run
-    losses = []
-    runtimes = []
+    parser = argparse.ArgumentParser(description="Set the dataset name")
+    parser.add_argument('--dataset_name', type=str, required=True, help="Name of the dataset")
+    parser.add_argument('--num_epochs', type=int, required=True, help="Number of epochs")
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Use the dataset_name from the command-line argument
+    dataset_name = args.dataset_name
+    num_epochs = args.num_epochs
+    path = dataset_name[:-3] + ".pkl"
+    num_seeds = 5 # Define the number of seeds to run
     
-    for path in pkl_paths:
-        print(f"Running model on dataset: {path}")
-        
-        seed_losses = []
-        seed_runtimes = []
-        
-        for seed in range(num_seeds):
-            loss, runtime = run_model_with_seed(path, seed)
-            seed_losses.append(loss)
-            seed_runtimes.append(runtime)
-        
-        # Calculate mean and standard deviation of loss and average runtime for the dataset
-        mean_loss = np.mean(seed_losses)
-        std_loss = np.std(seed_losses)
-        avg_runtime = np.mean(seed_runtimes)
-        
-        # Append the results to the losses and runtimes lists
-        losses.append({'Dataset': path, 'Mean Loss': mean_loss, 'Std Loss': std_loss})
-        runtimes.append({'Dataset': path, 'Average Runtime (seconds)': avg_runtime})
+    
+
+    print(f"Running model on dataset: {path}")
+    
+    seed_losses = []
+    seed_runtimes = []
+    
+    for seed in range(num_seeds):
+        loss, runtime = run_model_with_seed(path, seed, num_epochs)
+        seed_losses.append(loss)
+        seed_runtimes.append(runtime)
+    
+    # Calculate mean and standard deviation of loss and average runtime for the dataset
+    mean_loss = np.mean(seed_losses)
+    std_loss = np.std(seed_losses)
+    avg_runtime = np.mean(seed_runtimes)
+    std_runtime = np.std(seed_runtimes)
+    # Append the results to the losses and runtimes lists
+    losses={'Dataset': [path], 'Mean Loss': [mean_loss], 'Std Loss': [std_loss]}
+    runtimes={'Dataset': [path], 'Average Runtime (seconds)': [avg_runtime], 'Std Runtime': [std_runtime]}
 
     # Create DataFrames from the results
     loss_df = pd.DataFrame(losses)
     runtime_df = pd.DataFrame(runtimes)
 
     # Specify the CSV file paths
-    loss_csv_file_path = 'transformer_losses.csv'
-    runtime_csv_file_path = 'transformer_runtimes.csv'
+    loss_csv_file_path = dataset_name +'_transformer_losses.csv'
+    runtime_csv_file_path =dataset_name + '_transformer_runtimes.csv'
 
     # Save the DataFrames to CSV files
     loss_df.to_csv(loss_csv_file_path, index=False)

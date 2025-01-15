@@ -6,7 +6,7 @@ import json
 import time
 import copy 
 from datetime import datetime
-
+import argparse
 from library import load_dataset, make_json_serializable, get_baseline,Config   # Make sure these are properly defined or imported
 
 
@@ -113,11 +113,18 @@ def generate_indices(n, train_size, val_size, seed=0):
     return train_indices, val_indices, test_indices
 
 if __name__ == "__main__":
-    dataset_name = 'icu_dataset'
-    #dataset_names = ['icu_dataset', 'exp_dataset', 'sin_dataset', 'pol_dataset', 'gaussian_dataset']  # Example dataset name
+    parser = argparse.ArgumentParser(description="Set the dataset name")
+    parser.add_argument('--dataset_name', type=str, required=True, help="Name of the dataset")
+    parser.add_argument('--num_epochs', type=int, required=True, help="Number of epochs")
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Use the dataset_name from the command-line argument
+    dataset_name = args.dataset_name
+    num_epochs = args.num_epochs
     baselines = ['TTS']
-    n_trials = 1
-    n_tune = 1
+    n_trials = 5
+    n_tune = 10
     seed = 42
     n_basis = 9
     device = "cpu" 
@@ -142,7 +149,7 @@ if __name__ == "__main__":
                 'sin_dataset': 25,
                 'pol_dataset': 25,
                 'exp_dataset': 25,
-                'icu_dataset': 100}
+                'icu_dataset': 50}
     benchmark_options = {
         'n_trials': n_trials,
         'n_tune': n_tune,
@@ -163,7 +170,7 @@ if __name__ == "__main__":
     T=tts_T[dataset_name],
     seed=seed,
     dataloader_type='iterative',
-    num_epochs=100,
+    num_epochs=num_epochs,
     device=device,
     n_basis_tunable=False,
     dynamic_bias=True
