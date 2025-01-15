@@ -13,7 +13,7 @@
    ```bash
    wget -r -N -c -np https://physionet.org/files/bidmc/1.0.0/
 
-2. Change the paths in your 2_process_icu_datset.py script to point to the CSV files folder in the downloaded dataset.
+2. Change the paths in your 2_process_icu_dataset.py script to point to the CSV files folder in the downloaded dataset.
 
 ## Run scripts
 1. Run the run_all.sh file
