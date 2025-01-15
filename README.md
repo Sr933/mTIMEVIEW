@@ -1,4 +1,6 @@
-## mTIMEVIEW
+# mTIMEVIEW
+
+## Read the mTIMEVIEW.pdf for more information on the datasets and methods
 
 ## Environment Setup
 1. Ensure Conda is installed.
@@ -18,4 +20,6 @@
 ## Run scripts
 1. Run the run_all.sh file
 2. Alternatively, run the scripts individually changing the datasets and hyperparameters as desired.
+
+
 
