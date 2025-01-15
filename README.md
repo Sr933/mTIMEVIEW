@@ -5,7 +5,7 @@
 2. Create and activate the environment:
    ```bash
    conda env create -f environment.yml
-   conda activate <environment_name>
+   conda activate timeview
 
 ## Download data from Physionet using
 1. Run the following command to download the real dataset:
